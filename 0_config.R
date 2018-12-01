@@ -88,7 +88,9 @@ nombres_archivos_productos <- c(
   "observaciones_limpias_infys_2004_2016_arbolado_repoblado" = "2_observaciones_limpias_infys_2004_2016_arbolado_repoblado.rds",
   
   "df_sdm_datos_abundancia_infys" = "3_df_sdm_datos_abundancia_infys.rds",
+  "df_sdm_datos_abundancia_infys_conglomerados_anios" = "3_df_sdm_datos_abundancia_infys_conglomerados_anios.rds",
   "df_sdm_datos_incidencia_todas_fuentes" = "3_df_sdm_datos_incidencia_todas_fuentes.rds",
+  "df_sdm_datos_incidencia_todas_fuentes_anios" = "3_df_sdm_datos_incidencia_todas_fuentes_anios.rds",
   
   "brick_variables_ambientales" = "4_1_brick_variables_ambientales.rds",
   "pca_variables_ambientales" = "4_1_pca_variables_ambientales.rds",

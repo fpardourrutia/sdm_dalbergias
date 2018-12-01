@@ -117,8 +117,6 @@ rbind(
 # Por ello, para crear el data frame con datos de abundancia se utilizarán
 # únicamente datos del INFyS.
 
-glimpse(observaciones_limpias_infys)
-
 df_sdm_datos_abundancia_infys <- observaciones_limpias_infys  %>%
   filter(tabla == "Arbolado") %>%
   # Agrupando por muestreo espacial, genero y especie
@@ -163,6 +161,21 @@ ggplot(df_sdm_datos_abundancia_infys,
 
 saveRDS(df_sdm_datos_abundancia_infys,
   rutas_archivos_productos["df_sdm_datos_abundancia_infys"])
+
+### Y creando el data frame con observaciones desagregadas en el tiempo que es
+### de interés para Julián:
+df_sdm_datos_abundancia_infys_conglomerados_anios <- observaciones_limpias_infys %>%
+  filter(tabla == "Arbolado") %>%
+  select(-tabla) %>%
+  arrange(
+    conglomerado,
+    upm_id,
+    anio
+  )
+glimpse(df_sdm_datos_abundancia_infys_conglomerados_anios)
+
+saveRDS(df_sdm_datos_abundancia_infys_conglomerados_anios,
+  rutas_archivos_productos["df_sdm_datos_abundancia_infys_conglomerados_anios"])
 
 ################################################################################
 # 4. Creando data frame para ajustar modelos de distribución potencial usando 
@@ -224,4 +237,58 @@ ggplot(df_sdm_datos_incidencia_todas_fuentes,
 
 saveRDS(df_sdm_datos_incidencia_todas_fuentes,
   rutas_archivos_productos["df_sdm_datos_incidencia_todas_fuentes"])
-  
+
+### Ahora creando el data frame que quiere Julián para ajustar los modelos a
+### lo largo del tiempo
+df_sdm_datos_incidencia_todas_fuentes_anios <- rbind.fill(
+  observaciones_limpias_herbario %>%
+    select(
+      genero,
+      especie,
+      fecha_colecta,
+      longitud,
+      latitud
+    ) %>%
+    mutate(
+      anio = year(fecha_colecta),
+      mes = month(fecha_colecta),
+      dia = day(fecha_colecta),
+      fuente = "herbario"
+    ) %>%
+    select(-fecha_colecta),
+  observaciones_limpias_snib %>%
+    select(
+      genero,
+      especie,
+      fecha_colecta,
+      latitud,
+      longitud
+    ) %>%
+    mutate(
+      anio = as.numeric(stri_match_first_regex(fecha_colecta, pattern = "^([:digit:]{4}).*")[,2]),
+      mes = as.numeric(stri_match_first_regex(fecha_colecta, pattern = "^[:digit:]{4}-([:digit:]{2}).*")[,2]),
+      dia = as.numeric(stri_match_first_regex(fecha_colecta, pattern = "^[:digit:]{4}-[:digit:]{2}-([:digit:]{2})")[,2]),
+      fuente = "SNIB"
+    ) %>%
+    select(-fecha_colecta),
+  observaciones_limpias_infys %>%
+    select(
+      genero,
+      especie,
+      longitud,
+      latitud,
+      anio
+    ) %>%
+    mutate(
+      fuente = "INFYS"
+    )
+) %>%
+  distinct() %>%
+  mutate(
+    genero = as.character(genero),
+    especie = as.character(especie)
+  )
+
+saveRDS(df_sdm_datos_incidencia_todas_fuentes_anios,
+  rutas_archivos_productos["df_sdm_datos_incidencia_todas_fuentes_anios"])
+
